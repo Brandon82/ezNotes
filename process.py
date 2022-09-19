@@ -1,8 +1,8 @@
 import dearpygui.dearpygui as dpg
 
-def get_note(note):
+def get_note(note, notepath):
     data = ''''''
-    with open(f'{note}.txt', 'r+') as n1:
+    with open(f'{notepath}\\{note}.txt', 'r+') as n1:
         for line in n1:
             data += line
     n1.close()
