@@ -12,8 +12,11 @@ class Note:
     def refresh(self):
         if(os.path.exists(self.folderpath)):
             self.readlines()
-        else:
-            os.makedirs(self.folderpath)
+            if(not os.path.exists(self.fullpath)):
+                open(self.fullpath, 'w')
+        else:  
+            os.mkdir(self.folderpath)
+            open(self.fullpath, 'w')
             self.readlines()
     
     def empty_file(self):
@@ -39,7 +42,7 @@ class Note:
 
     def readlines(self):
         data = ''''''
-        with open(self.fullpath, 'r+') as n1:
+        with open(self.fullpath, 'r') as n1:
             for line in n1:
                 data += line
         n1.close()
