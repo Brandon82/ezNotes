@@ -3,6 +3,7 @@ import os
 from dearpygui.demo import show_demo
 from themes import *
 from helpers import *
+from process import *
 import ctypes
 import subprocess
 
@@ -11,10 +12,18 @@ ctypes.windll.shcore.SetProcessDpiAwareness(2)
 W_WIDTH = 700
 W_HEIGHT = 400
 SIDEBAR_SIZE = 150
-APP_NAME = 'ez.Notes'
+APP_NAME = 'ez.Note'
+APP_VER = 'v1.0'
 
 CUR_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
-NOTE_PATH = os.path.dirname(os.path.realpath(__file__))
+
+print(CUR_FILE_PATH)
+cur_note_file = 'Note1'
+cur_full_path = f'{CUR_FILE_PATH}\{cur_note_file}.txt'
+
+cur_note = ''''''
+cur_note = get_note(cur_note_file)
+print(cur_note)
 
 #file_path = os.getcwd()
 note_list = ['Notes', 'Settings', 'Themes']
@@ -24,7 +33,22 @@ dpg.create_context()
 def auto_center_cb(s, d):
     win_width = dpg.get_item_width(mainw)
     win_height = dpg.get_item_height(mainw)
-    dpg.set_item_width(item=spcr1, width=(win_width - SIDEBAR_SIZE - dpg.get_item_width(clear_btn)*1.5))
+    #dpg.set_item_width(item=spcr1, width=(win_width - SIDEBAR_SIZE - dpg.get_item_width(clear_btn)*1.5 - 40))
+
+    dpg.set_item_pos(item=app_name_tag, pos=[2, win_height-40])
+    dpg.set_item_pos(item=app_ver_tag, pos=[114, win_height-40])
+
+    tab_width = dpg.get_item_rect_size(item=tab1)[0]
+    tab_height = dpg.get_item_rect_size(item=tab1)[1]
+
+    dpg.set_item_width(item=note_inp, width=tab_width-80)
+    dpg.set_item_height(item=note_inp, height=tab_height-180)
+
+    btn_width1 = dpg.get_item_rect_size(item=refrsh_btn)[0]
+    btn_width2 = dpg.get_item_rect_size(item=clear_btn)[0]
+
+    dpg.set_item_pos(item=t1_header2, pos=[tab_width-80-btn_width1-btn_width2+8, 10])
+
 
 def sidebar_cb(s, d):
     #s=sender=tag
@@ -55,20 +79,42 @@ def sidebar_cb(s, d):
                 dpg.show_item(tab3)
 
 def open_note_cb(s, d):
-    subprocess.Popen(f'explorer /select,{NOTE_PATH}')
+    subprocess.Popen(f'explorer /select,{cur_full_path}')
+    print(dpg.get_text_size(app_title_text)[0])
+    
+def note_editor_cb(s, d):
+    global cur_note
+    cur_note = dpg.get_value(s)
+
+def save_note_cb(s, d):
+    save_note(cur_note_file, cur_note)
+
+def clear_note_cb(s, d):
+    empty_file(cur_note_file)
+    refresh_note()
+
+def refresh_note():
+    global cur_note
+    cur_note = get_note(cur_note_file)
+    dpg.set_value(item=note_inp, value=cur_note)
 
 with dpg.font_registry():
-    title_font = dpg.add_font('C:\Windows\Fonts\Kayak Sans Bold.otf', 20)
+    title_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-Bold.ttf', 26)
     default_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-SemiBold.ttf', 20)
-    open_sans_bold_title = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-Bold.ttf', 20)
+    icon_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\heydings_controls.ttf', 24)
+
+
 
 with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize=True, no_move=True) as mainw:
     dpg.bind_font(default_font)
-
     with dpg.group(horizontal=True) as main_group:
-        with dpg.child_window(label='side_bar', show=True, width=SIDEBAR_SIZE) as side_bar:
-            dpg.add_text(APP_NAME)
-            dpg.add_dummy(height=100)
+        # --- SIDE BAR ---
+        with dpg.child_window(label='side_bar', show=True, width=SIDEBAR_SIZE, no_scrollbar=True) as side_bar:
+
+            app_title_text = dpg.add_text(APP_NAME, tag='app_title_text', pos=(36, 6))
+            dpg.bind_item_font(app_title_text, title_font)
+
+            dpg.add_spacer(height=100)
 
             sbb1 = dpg.add_button(label='Notes', width=SIDEBAR_SIZE-1, tag='Notes', height=30, callback=sidebar_cb)
             apply_tab_button_active(sbb1, sidebar_buttn)
@@ -77,25 +123,32 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
             sbb3 = dpg.add_button(label='Themes', width=SIDEBAR_SIZE-1, tag='Themes', height=30, callback=sidebar_cb)
             apply_tab_button_inactive(sbb3)
 
+            #dpg.add_spacer(height=100)
+
+            app_ver_tag = dpg.add_text(APP_VER, color=(160,160,160))
+            app_name_tag = dpg.add_text(APP_NAME, color=(160,160,160))
+
         # --- Main Tab ---
         with dpg.child_window(label='tab1', show=True) as tab1:
 
             with dpg.group(horizontal=True) as t1_header:
-                dpg.add_text("Note 1:")
+                title_font_tab = dpg.add_text("Note 1:")
+                dpg.bind_item_font(title_font_tab, title_font)
                 spcr1 = dpg.add_spacer(width=400)
-                clear_btn = dpg.add_button(label='Clear note', tag='clearbtn', width=130, height=28)
+                with dpg.group(horizontal=True) as t1_header2:
+                    refrsh_btn = dpg.add_button(label='r', tag='refrsh_btnbtn', height=34, width=40, callback=refresh_note)
+                    clear_btn = dpg.add_button(label='T', tag='clearbtn', height=34, width=40, callback=clear_note_cb)
+                    dpg.bind_item_font(refrsh_btn, icon_font)
+                    dpg.bind_item_font(clear_btn, icon_font)
 
-            line1 = LayoutHelper()
-            line1.add_widget(dpg.add_input_text(tag='note_input', default_value='Enter Note', multiline=True, height=200), 95)
-            line1.add_widget(dpg.add_spacer(), 5.0)
-            line1.submit()
-            
-            save_btn = dpg.add_button(label='Save note', tag='savebtn', width=180, height=30)
+            note_inp = dpg.add_input_text(tag='note_inp', default_value=cur_note, callback=note_editor_cb, multiline=True, height=200)
+
+            save_btn = dpg.add_button(label='Save note', tag='savebtn', width=180, height=30, callback=save_note_cb)
             opennote_btn = dpg.add_button(label='Open File Path', tag='openfilebtn', width=180, height=30, callback=open_note_cb)
 
             with dpg.group(horizontal=True) as cur_path_grp:
                 dpg.add_text('Note Path: ')
-                cur_path_text = dpg.add_text(NOTE_PATH, color=(150, 150, 150))
+                cur_path_text = dpg.add_text(cur_full_path, color=(150, 150, 150))
 
         # --- Settings Tab ---
         with dpg.child_window(label='tab2', show=False) as tab2:
@@ -116,7 +169,7 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
 
             with dpg.group(horizontal=True) as cur_path_grp:
                 dpg.add_text('Note Path: ')
-                cur_path_text = dpg.add_text(NOTE_PATH, color=(150, 150, 150))
+                cur_path_text = dpg.add_text(cur_full_path, color=(150, 150, 150))
             
 
         with dpg.child_window(label='tab3', show=False) as tab3:
@@ -126,9 +179,6 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
             dpg.add_color_edit(label='Text', no_picker=True)
             dpg.add_color_edit(label='Accent Color', no_picker=True)
             reset_theme_btn = dpg.add_button(label='Reset Theme', tag='resetthemebtn', width=180, height=30)
-
-
-
 
 
 with dpg.theme() as zero_theme:

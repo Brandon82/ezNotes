@@ -11,7 +11,6 @@ sidebar_col = (40, 40, 40)
 sidebar_buttn = (0, 144, 255)
  
 
-
 def apply_main_theme(window='', apply_other=False):
     with dpg.theme() as mtheme:
         with dpg.theme_component(dpg.mvAll):
@@ -25,7 +24,7 @@ def apply_main_theme(window='', apply_other=False):
 
             dpg.add_theme_style(dpg.mvStyleVar_WindowPadding, 10, 10)
             dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 0, 2)  
-            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 1, 5)            
+            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 1, 4)            
 
             # --- Colors ---
             dpg.add_theme_color(dpg.mvThemeCol_Text, text_col)
