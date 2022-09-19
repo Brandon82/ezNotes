@@ -6,6 +6,7 @@ from helpers import *
 from process import *
 import ctypes
 import subprocess
+import easygui
 
 ctypes.windll.shcore.SetProcessDpiAwareness(2)
 
@@ -17,23 +18,24 @@ APP_VER = 'v1.0'
 
 CUR_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
-print(CUR_FILE_PATH)
 cur_note_file = 'Note1'
-cur_full_path = f'{CUR_FILE_PATH}\{cur_note_file}.txt'
 
-cur_note = ''''''
-cur_note = get_note(cur_note_file)
-print(cur_note)
+cur_note_path = f'{CUR_FILE_PATH}\\Notes'
+cur_full_path = f'{CUR_FILE_PATH}\\Notes\\{cur_note_file}.txt'
 
-#file_path = os.getcwd()
+#cur_note = get_note(notepath=cur_note_folder, note=cur_note_file)
+cur_note_active = ''''''
+cur_note = Note(cur_note_file, cur_note_path, cur_note_active)
+cur_note_active = cur_note.refresh()
+
 note_list = ['Notes', 'Settings', 'Themes']
 
 dpg.create_context()
 
+    #s=sender=tag
 def auto_center_cb(s, d):
     win_width = dpg.get_item_width(mainw)
     win_height = dpg.get_item_height(mainw)
-    #dpg.set_item_width(item=spcr1, width=(win_width - SIDEBAR_SIZE - dpg.get_item_width(clear_btn)*1.5 - 40))
 
     dpg.set_item_pos(item=app_name_tag, pos=[2, win_height-40])
     dpg.set_item_pos(item=app_ver_tag, pos=[114, win_height-40])
@@ -51,7 +53,6 @@ def auto_center_cb(s, d):
 
 
 def sidebar_cb(s, d):
-    #s=sender=tag
     if s in note_list:
         if s==note_list[0]:
             apply_tab_button_active(sbb1, sidebar_buttn)
@@ -83,27 +84,26 @@ def open_note_cb(s, d):
     print(dpg.get_text_size(app_title_text)[0])
     
 def note_editor_cb(s, d):
-    global cur_note
-    cur_note = dpg.get_value(s)
+    cur_note.set_note(dpg.get_value(s))
 
 def save_note_cb(s, d):
-    save_note(cur_note_file, cur_note)
+    cur_note.save_file()
 
 def clear_note_cb(s, d):
-    empty_file(cur_note_file)
+    cur_note.empty_file()
     refresh_note()
 
 def refresh_note():
-    global cur_note
-    cur_note = get_note(cur_note_file)
-    dpg.set_value(item=note_inp, value=cur_note)
+    cur_note.refresh()
+    dpg.set_value(item=note_inp, value=cur_note.get_note())
+
+def file_change_cb(s, d):
+    new_file = easygui.diropenbox()
 
 with dpg.font_registry():
     title_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-Bold.ttf', 26)
     default_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-SemiBold.ttf', 20)
     icon_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\heydings_controls.ttf', 24)
-
-
 
 with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize=True, no_move=True) as mainw:
     dpg.bind_font(default_font)
@@ -141,14 +141,14 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
                     dpg.bind_item_font(refrsh_btn, icon_font)
                     dpg.bind_item_font(clear_btn, icon_font)
 
-            note_inp = dpg.add_input_text(tag='note_inp', default_value=cur_note, callback=note_editor_cb, multiline=True, height=200)
+            note_inp = dpg.add_input_text(tag='note_inp', default_value='Click', callback=note_editor_cb, multiline=True, height=200)
 
             save_btn = dpg.add_button(label='Save note', tag='savebtn', width=180, height=30, callback=save_note_cb)
             opennote_btn = dpg.add_button(label='Open File Path', tag='openfilebtn', width=180, height=30, callback=open_note_cb)
 
             with dpg.group(horizontal=True) as cur_path_grp:
                 dpg.add_text('Note Path: ')
-                cur_path_text = dpg.add_text(cur_full_path, color=(150, 150, 150))
+                cur_path_text = dpg.add_text(cur_note_path, color=(150, 150, 150))
 
         # --- Settings Tab ---
         with dpg.child_window(label='tab2', show=False) as tab2:
@@ -163,14 +163,18 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
             open_gh_btn = dpg.add_button(label='Open Github', tag='openghbtn', width=180, height=30)
 
 
+            change_path_btn = dpg.add_button(label='Change Note Path', tag='changepathbtn', width=180, height=30, callback=file_change_cb)
+
+
             with dpg.group(horizontal=True) as cur_path_grp:
                 dpg.add_text('App Path: ')
                 cur_path_text = dpg.add_text(CUR_FILE_PATH, color=(150, 150, 150))
 
+
             with dpg.group(horizontal=True) as cur_path_grp:
                 dpg.add_text('Note Path: ')
-                cur_path_text = dpg.add_text(cur_full_path, color=(150, 150, 150))
-            
+                cur_path_text = dpg.add_text(cur_note_path, color=(150, 150, 150))
+
 
         with dpg.child_window(label='tab3', show=False) as tab3:
             dpg.add_text("Themes:")
@@ -211,7 +215,7 @@ apply_main_theme(tab1, True)
 apply_main_theme(tab2, True)
 apply_main_theme(tab3, True)
 
-dpg.create_viewport(title = 'Simple ', width = W_WIDTH+16, height = W_HEIGHT+38)
+dpg.create_viewport(title = 'Simple ', width = W_WIDTH+16, height = W_HEIGHT+38, min_width=int(W_WIDTH*.7), min_height=int(W_HEIGHT*.7))
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.set_primary_window(mainw, True)
