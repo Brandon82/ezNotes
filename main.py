@@ -18,6 +18,8 @@ APP_VER = 'v1.0'
 
 CUR_FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
+opt_auto_save = False
+
 cur_note_file = 'Note1'
 
 cur_note_path = f'{CUR_FILE_PATH}\\Notes'
@@ -40,6 +42,8 @@ def auto_center_cb(s, d):
     dpg.set_item_pos(item=app_name_tag, pos=[2, win_height-40])
     dpg.set_item_pos(item=app_ver_tag, pos=[114, win_height-40])
 
+    dpg.set_item_pos(item=bottom_setting_grp, pos=[10, win_height - 138])
+
     tab_width = dpg.get_item_rect_size(item=tab1)[0]
     tab_height = dpg.get_item_rect_size(item=tab1)[1]
 
@@ -53,6 +57,7 @@ def auto_center_cb(s, d):
 
 
 def sidebar_cb(s, d):
+    auto_center_cb('', '')
     if s in note_list:
         if s==note_list[0]:
             apply_tab_button_active(sbb1, sidebar_buttn)
@@ -81,10 +86,12 @@ def sidebar_cb(s, d):
 
 def open_note_cb(s, d):
     subprocess.Popen(f'explorer /select,{cur_full_path}')
-    print(dpg.get_text_size(app_title_text)[0])
     
 def note_editor_cb(s, d):
     cur_note.set_note(dpg.get_value(s))
+    if opt_auto_save == True:
+        print('l')
+        cur_note.save_file()
 
 def save_note_cb(s, d):
     cur_note.save_file()
@@ -100,8 +107,18 @@ def refresh_note():
 def file_change_cb(s, d):
     new_file = easygui.diropenbox()
 
+def auto_save_cb(s, d):
+    global opt_auto_save
+    if dpg.get_value(s) == True:
+        opt_auto_save = True
+    else:
+        opt_auto_save = False
+
+def title_font1(label):
+    dpg.add_text(label=label)
+
 with dpg.font_registry():
-    title_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-Bold.ttf', 26)
+    title_font1 = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-Bold.ttf', 26)
     default_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\OpenSans-SemiBold.ttf', 20)
     icon_font = dpg.add_font(CUR_FILE_PATH + '\Fonts\heydings_controls.ttf', 24)
 
@@ -112,7 +129,7 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
         with dpg.child_window(label='side_bar', show=True, width=SIDEBAR_SIZE, no_scrollbar=True) as side_bar:
 
             app_title_text = dpg.add_text(APP_NAME, tag='app_title_text', pos=(36, 6))
-            dpg.bind_item_font(app_title_text, title_font)
+            dpg.bind_item_font(app_title_text, title_font1)
 
             dpg.add_spacer(height=100)
 
@@ -133,7 +150,7 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
 
             with dpg.group(horizontal=True) as t1_header:
                 title_font_tab = dpg.add_text("Note 1:")
-                dpg.bind_item_font(title_font_tab, title_font)
+                dpg.bind_item_font(title_font_tab, title_font1)
                 spcr1 = dpg.add_spacer(width=400)
                 with dpg.group(horizontal=True) as t1_header2:
                     refrsh_btn = dpg.add_button(label='r', tag='refrsh_btnbtn', height=34, width=40, callback=refresh_note)
@@ -158,22 +175,21 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
 
             #dpg.add_text("Note Font: ")
             dpg.add_combo(label='Note Font', tag='notefont_combo', items=('a', 'b', 'c'), width=240)
-            dpg.add_checkbox(label='Auto-save notes')
-
-            open_gh_btn = dpg.add_button(label='Open Github', tag='openghbtn', width=180, height=30)
+            dpg.add_checkbox(label='Auto-save Note', callback=auto_save_cb)
 
 
-            change_path_btn = dpg.add_button(label='Change Note Path', tag='changepathbtn', width=180, height=30, callback=file_change_cb)
 
+            with dpg.group() as bottom_setting_grp:
+                open_gh_btn = dpg.add_button(label='Open Github', tag='openghbtn', width=180, height=30)
+                change_path_btn = dpg.add_button(label='Change Note Path', tag='changepathbtn', width=180, height=30, callback=file_change_cb)
 
-            with dpg.group(horizontal=True) as cur_path_grp:
-                dpg.add_text('App Path: ')
-                cur_path_text = dpg.add_text(CUR_FILE_PATH, color=(150, 150, 150))
+                with dpg.group(horizontal=True) as cur_path_grp:
+                    dpg.add_text('App Path: ')
+                    cur_path_text = dpg.add_text(CUR_FILE_PATH, color=(150, 150, 150))
 
-
-            with dpg.group(horizontal=True) as cur_path_grp:
-                dpg.add_text('Note Path: ')
-                cur_path_text = dpg.add_text(cur_note_path, color=(150, 150, 150))
+                with dpg.group(horizontal=True) as cur_path_grp2:
+                    dpg.add_text('Note Path: ')
+                    cur_path_text = dpg.add_text(cur_note_path, color=(150, 150, 150))
 
 
         with dpg.child_window(label='tab3', show=False) as tab3:
@@ -206,7 +222,6 @@ with dpg.theme() as sb_theme:
 
 #show_demo()
 dpg.show_style_editor()
-
 apply_main_theme()
 dpg.bind_item_theme(mainw, zero_theme)
 dpg.bind_item_theme(side_bar, sb_theme)
