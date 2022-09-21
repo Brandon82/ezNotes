@@ -5,7 +5,7 @@ A simple text editor for Windows.
 
 Includes built-in notes which are automatically created and saved where the app is located.
 
-Created using Python and Dearpygui
+Created using Python 3.10.1 and Dearpygui
 ## Screenshots
 
 ![App Screenshot](https://i.gyazo.com/48d97355fea1af457d10f88c1ae9eda9.png)
