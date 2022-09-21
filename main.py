@@ -25,7 +25,6 @@ cur_note_file = 'Note1'
 cur_note_path = f'{CUR_FILE_PATH}\\Notes'
 cur_full_path = f'{CUR_FILE_PATH}\\Notes\\{cur_note_file}.txt'
 
-#cur_note = get_note(notepath=cur_note_folder, note=cur_note_file)
 cur_note_active = ''''''
 cur_note = Note(cur_note_file, cur_note_path, cur_note_active)
 cur_note_active = cur_note.refresh()
@@ -54,7 +53,6 @@ def auto_center_cb(s, d):
     btn_width2 = dpg.get_item_rect_size(item=clear_btn)[0]
 
     dpg.set_item_pos(item=t1_header2, pos=[tab_width-80-btn_width1-btn_width2+8, 10])
-
 
 def sidebar_cb(s, d):
     auto_center_cb('', '')
@@ -90,7 +88,6 @@ def open_note_cb(s, d):
 def note_editor_cb(s, d):
     cur_note.set_note(dpg.get_value(s))
     if opt_auto_save == True:
-        print('l')
         cur_note.save_file()
 
 def save_note_cb(s, d):
@@ -149,8 +146,9 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
         with dpg.child_window(label='tab1', show=True) as tab1:
 
             with dpg.group(horizontal=True) as t1_header:
-                title_font_tab = dpg.add_text("Note 1:")
-                dpg.bind_item_font(title_font_tab, title_font1)
+                title_tab1 = dpg.add_text("Note 1:")
+                dpg.bind_item_font(title_tab1, title_font1)
+
                 spcr1 = dpg.add_spacer(width=400)
                 with dpg.group(horizontal=True) as t1_header2:
                     refrsh_btn = dpg.add_button(label='r', tag='refrsh_btnbtn', height=34, width=40, callback=refresh_note)
@@ -169,8 +167,10 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
 
         # --- Settings Tab ---
         with dpg.child_window(label='tab2', show=False) as tab2:
-            dpg.add_text("Settings [NYI]:")
-            #dpg.add_text("UI Font: ")
+            settings_title = dpg.add_text("Settings [NYI]:")
+            dpg.bind_item_font(settings_title, title_font1)
+           
+
             dpg.add_combo(label='UI Font', tag='uifont_combo', items=('a', 'b', 'c'), width=240)
 
             #dpg.add_text("Note Font: ")
@@ -190,10 +190,11 @@ with dpg.window(width = W_WIDTH, height = W_HEIGHT, no_title_bar=True, no_resize
                 with dpg.group(horizontal=True) as cur_path_grp2:
                     dpg.add_text('Note Path: ')
                     cur_path_text = dpg.add_text(cur_note_path, color=(150, 150, 150))
-
+    
 
         with dpg.child_window(label='tab3', show=False) as tab3:
-            dpg.add_text("Themes:")
+            themes_title = dpg.add_text("Themes:")
+            dpg.bind_item_font(themes_title, title_font1)
             dpg.add_color_edit(label='Main Background', no_picker=True)
             dpg.add_color_edit(label='Sidebar Background', no_picker=True)
             dpg.add_color_edit(label='Text', no_picker=True)
@@ -219,9 +220,8 @@ with dpg.theme() as sb_theme:
         dpg.add_theme_color(dpg.mvThemeCol_ChildBg, sidebar_col) 
         dpg.add_theme_color(dpg.mvThemeCol_Button, sidebar_col)   
 
-
 #show_demo()
-dpg.show_style_editor()
+#dpg.show_style_editor()
 apply_main_theme()
 dpg.bind_item_theme(mainw, zero_theme)
 dpg.bind_item_theme(side_bar, sb_theme)
@@ -230,7 +230,7 @@ apply_main_theme(tab1, True)
 apply_main_theme(tab2, True)
 apply_main_theme(tab3, True)
 
-dpg.create_viewport(title = 'Simple ', width = W_WIDTH+16, height = W_HEIGHT+38, min_width=int(W_WIDTH*.7), min_height=int(W_HEIGHT*.7))
+dpg.create_viewport(title = 'ez.Notes', width = W_WIDTH+16, height = W_HEIGHT+38, min_width=int(W_WIDTH*.7), min_height=int(W_HEIGHT*.7))
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.set_primary_window(mainw, True)

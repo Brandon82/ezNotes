@@ -1,15 +1,25 @@
-# easy-notes
-Settings and Themes features are still being implemented
+
+# ez.Notes
+
+A simple text editor for Windows.
+
+Includes built-in notes which are automatically created and saved where the app is located.
+
+Created using Python and Dearpygui
+## Screenshots
+
+![App Screenshot](https://i.gyazo.com/48d97355fea1af457d10f88c1ae9eda9.png)
+
+![App Screenshot](https://i.gyazo.com/0fb732b6a2f2882082e7e91e4eaa7301.png)
 
 
-Functionality:
+## Installation
 
-Creates a ~\Notes folder where the app is located 
+Install the following packages:
 
-Open file path of selected note
-
-Save note text to corresponding file
-
-Delete all text from the selected note
-
-Refresh virtual note to match the file
+```bash
+  pip install dearpygui==1.6.2
+  pip install easygui==0.98.3
+```
+    
+open main.py to run the program

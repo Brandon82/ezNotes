@@ -1,6 +1,5 @@
 import dearpygui.dearpygui as dpg
 from colors import *
-import time
 
 main_bg_col = (80, 80, 80)
 text_col = (255, 255, 255, 255)
@@ -10,7 +9,6 @@ child_bg_col = (80, 80, 80)
 sidebar_col = (40, 40, 40)
 sidebar_buttn = (0, 144, 255)
  
-
 def apply_main_theme(window='', apply_other=False):
     with dpg.theme() as mtheme:
         with dpg.theme_component(dpg.mvAll):
@@ -49,7 +47,6 @@ def apply_main_theme(window='', apply_other=False):
         dpg.bind_item_theme(window, mtheme)
     else:
         dpg.bind_theme(mtheme)
-
 
 
 # Tab menu colors are the background colors (Not accents)
