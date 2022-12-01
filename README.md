@@ -1,11 +1,11 @@
 
-# ez.Notes
+# ezNotes
 
-A simple text editor for Windows.
+A simple text editor and note taking app for Windows and MacOS.
 
 Includes built-in notes which are automatically created and saved where the app is located.
 
-Created using Python 3.10.1 and Dearpygui
+Created using Python 3.10.1 and the DearPyGui Framework
 ## Screenshots
 
 ![App Screenshot](https://i.gyazo.com/48d97355fea1af457d10f88c1ae9eda9.png)
@@ -21,5 +21,3 @@ Install the following packages:
   pip install dearpygui==1.6.2
   pip install easygui==0.98.3
 ```
-    
-open main.py to run the program
